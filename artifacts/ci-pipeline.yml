@@ -1,0 +1,299 @@
+name: CI Pipeline
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  lint-and-test:
+    name: Lint & Test
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: findone
+          POSTGRES_PASSWORD: findone
+          POSTGRES_DB: findone_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: pip
+          cache-dependency-path: backend/requirements*.txt
+
+      - name: Install backend dependencies
+        run: pip install -r backend/requirements.txt -r backend/requirements-dev.txt
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Backend — pytest
+        env:
+          DATABASE_URL: postgresql://findone:findone@localhost:5432/findone_test
+          SUPABASE_URL: ""
+          SUPABASE_SERVICE_KEY: ""
+          SUPABASE_JWT_SECRET: ""
+          ANTHROPIC_API_KEY: ""
+          JSEARCH_API_KEY: ""
+        run: pytest backend/tests/ -v --tb=short
+
+      - name: Backend — flake8
+        run: flake8 backend/app/ --max-line-length=100
+
+      - name: Backend — mypy
+        run: mypy backend/app/ --ignore-missing-imports
+
+      - name: Frontend — vitest
+        working-directory: frontend
+        run: npm run test:run
+
+      - name: Frontend — eslint
+        working-directory: frontend
+        run: npm run lint
+
+  security-scans:
+    name: Security Scans
+    needs: lint-and-test
+    runs-on: ubuntu-latest
+    environment: staging
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: findone
+          POSTGRES_PASSWORD: findone
+          POSTGRES_DB: findone_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: pip
+          cache-dependency-path: backend/requirements*.txt
+
+      - name: Install Python dependencies
+        run: pip install -r backend/requirements.txt bandit semgrep pip-audit
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Create report directory
+        id: report_dir
+        run: |
+          TIMESTAMP=$(date +'%Y-%m-%d_%H-%M-%S')
+          REPORT_DIR="security-reports/${TIMESTAMP}"
+          mkdir -p "${REPORT_DIR}"
+          echo "dir=${REPORT_DIR}" >> "$GITHUB_OUTPUT"
+          echo "ts=${TIMESTAMP}" >> "$GITHUB_OUTPUT"
+
+      - name: TruffleHog
+        env:
+          REPORT_DIR: ${{ steps.report_dir.outputs.dir }}
+          TS: ${{ steps.report_dir.outputs.ts }}
+        run: |
+          pip install trufflehog3 2>/dev/null || pip install trufflehog 2>/dev/null || true
+          trufflehog git file://. --only-verified --json \
+            > "${REPORT_DIR}/trufflehog_${TS}.json" 2>&1 || true
+          # Real findings contain "DetectorName"; log lines contain "level" — grep distinguishes them
+          if grep -q '"DetectorName"' "${REPORT_DIR}/trufflehog_${TS}.json" 2>/dev/null; then
+            echo "::error::TruffleHog found verified secrets in git history."
+            exit 1
+          fi
+
+      - name: pip-audit
+        env:
+          REPORT_DIR: ${{ steps.report_dir.outputs.dir }}
+          TS: ${{ steps.report_dir.outputs.ts }}
+        run: |
+          # Always save the JSON report for artifact upload
+          pip-audit -r backend/requirements.txt -f json \
+            -o "${REPORT_DIR}/pip-audit_${TS}.json" 2>&1 || true
+          # Block if any vulnerability found (pip-audit exits 1 when vulns exist)
+          pip-audit -r backend/requirements.txt 2>&1 || {
+            echo "::error::pip-audit found vulnerabilities in Python dependencies."
+            exit 1
+          }
+
+      - name: npm audit
+        env:
+          REPORT_DIR: ${{ steps.report_dir.outputs.dir }}
+          TS: ${{ steps.report_dir.outputs.ts }}
+        working-directory: frontend
+        run: |
+          # Always save the JSON report for artifact upload
+          npm audit --json > "../${REPORT_DIR}/npm-audit_${TS}.json" 2>&1 || true
+          # Block on CRITICAL severity only
+          npm audit --audit-level=critical || {
+            echo "::error::npm audit found CRITICAL vulnerabilities in JS dependencies."
+            exit 1
+          }
+
+      - name: Bandit
+        env:
+          REPORT_DIR: ${{ steps.report_dir.outputs.dir }}
+          TS: ${{ steps.report_dir.outputs.ts }}
+        run: |
+          # Always save the full JSON report for artifact upload
+          bandit -r backend/app/ -f json \
+            -o "${REPORT_DIR}/bandit_${TS}.json" 2>&1 || true
+          # Block on HIGH severity + MEDIUM confidence (exit code 1 when issues found)
+          bandit -r backend/app/ \
+            --severity-level high \
+            --confidence-level medium \
+            --quiet 2>&1 || {
+            echo "::error::Bandit found HIGH severity issues in Python code."
+            exit 1
+          }
+
+      - name: Semgrep
+        env:
+          REPORT_DIR: ${{ steps.report_dir.outputs.dir }}
+          TS: ${{ steps.report_dir.outputs.ts }}
+        run: |
+          semgrep scan --config=auto --json \
+            --output="${REPORT_DIR}/semgrep_${TS}.json" \
+            backend/ frontend/src/ 2>&1 || true
+
+      - name: Checkov
+        env:
+          REPORT_DIR: ${{ steps.report_dir.outputs.dir }}
+          TS: ${{ steps.report_dir.outputs.ts }}
+        run: |
+          pip install checkov
+          checkov -d . --output json \
+            > "${REPORT_DIR}/checkov_${TS}.json" 2>&1 || true
+
+      - name: Run Alembic migrations for ZAP test DB
+        env:
+          DATABASE_URL: postgresql://findone:findone@localhost:5432/findone_test
+        run: |
+          cd backend
+          alembic upgrade head
+
+      - name: OWASP ZAP baseline scan (authenticated)
+        env:
+          REPORT_DIR: ${{ steps.report_dir.outputs.dir }}
+          TS: ${{ steps.report_dir.outputs.ts }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_JWT_SECRET: ${{ secrets.SUPABASE_JWT_SECRET }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          JSEARCH_API_KEY: ${{ secrets.JSEARCH_API_KEY }}
+        run: |
+          docker pull ghcr.io/zaproxy/zaproxy:stable 2>/dev/null || true
+          # Start the backend with REAL Supabase secrets — auth actually
+          # works, so ZAP (with the service_role JWT below) can reach
+          # authenticated endpoints instead of being bounced with 401.
+          # cd into backend/ so `from app.config` resolves.
+          pip install -r backend/requirements.txt 2>/dev/null || true
+          (
+            cd backend
+            DATABASE_URL="postgresql://findone:findone@localhost:5432/findone_test" \
+              uvicorn app.main:app --host 0.0.0.0 --port 8000 \
+              > /tmp/uvicorn.log 2>&1 &
+          )
+          for i in $(seq 1 20); do
+            if curl -sf http://localhost:8000/health >/dev/null 2>&1; then
+              echo "backend up after ${i}s"
+              break
+            fi
+            sleep 1
+          done
+          if ! curl -sf http://localhost:8000/health >/dev/null 2>&1; then
+            echo "::error::backend failed to start — ZAP would scan nothing"
+            echo "--- uvicorn.log ---"; cat /tmp/uvicorn.log || true
+            exit 1
+          fi
+
+          # Prep the ZAP working directory on the host:
+          #  (1) chmod 777 so the container's non-root 'zap' user can write
+          #  (2) copy the auth hook into it; the hook reads
+          #      ZAP_AUTH_TOKEN and adds Authorization: Bearer <token>
+          #      on every request via ZAP's replacer API. Service-role
+          #      JWT is HS256-signed with SUPABASE_JWT_SECRET so
+          #      backend/app/services/auth.py accepts it through the
+          #      symmetric path.
+          chmod 777 "${REPORT_DIR}"
+          cp .github/workflows/zap_auth_hook.py "${REPORT_DIR}/zap_auth_hook.py"
+
+          # zap-api-scan.py consumes FastAPI's /openapi.json — every
+          # declared route is enumerated and scanned with the Bearer
+          # token injected by the hook. zap-baseline.py's HTML spider
+          # can't discover REST endpoints, which was capping us at ~3
+          # routes (/health plus redirects).
+          docker run --rm --network host \
+            -v "$(pwd)/${REPORT_DIR}:/zap/wrk" \
+            -e ZAP_AUTH_TOKEN="${SUPABASE_SERVICE_KEY}" \
+            ghcr.io/zaproxy/zaproxy:stable \
+            zap-api-scan.py \
+              -t http://localhost:8000/openapi.json \
+              -f openapi \
+              -J "zap_${TS}.json" \
+              --hook=/zap/wrk/zap_auth_hook.py \
+              -d 2>&1 | tee /tmp/zap_output.txt || true
+
+      - name: Upload security artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-report-${{ steps.report_dir.outputs.ts }}
+          path: ${{ steps.report_dir.outputs.dir }}/
+          retention-days: 30
+
+      - name: Generate SBOM
+        if: always()
+        uses: anchore/sbom-action@v0
+        with:
+          path: .
+          format: spdx-json
+          artifact-name: sbom.spdx.json
+
+      - name: Upload SBOM artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom-${{ steps.report_dir.outputs.ts }}
+          path: sbom.spdx.json
+          retention-days: 30

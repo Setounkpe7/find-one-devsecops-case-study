@@ -1,0 +1,134 @@
+{
+  "tool": "trufflehog",
+  "mode": "--only-verified equivalent (post-filtered)",
+  "scan_date": "2026-04-20",
+  "findings_count": 4,
+  "findings": [
+    {
+      "SourceMetadata": {
+        "Data": {
+          "Git": {
+            "commit": "2cea20456db62a0428030049a96ea22b7a8d941b",
+            "file": "docs/superpowers/plans/find-one-implementation-plan.md",
+            "email": "github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>",
+            "repository": "file:///home/user/Github/Find-One",
+            "timestamp": "2026-04-16 01:17:31 +0000",
+            "line": 348
+          }
+        }
+      },
+      "SourceID": 1,
+      "SourceType": 16,
+      "SourceName": "trufflehog - git",
+      "DetectorType": 968,
+      "DetectorName": "Postgres",
+      "DetectorDescription": "Postgres connection string containing credentials",
+      "DecoderName": "PLAIN",
+      "Verified": false,
+      "VerificationError": "lookup db on 127.0.0.53:53: server misbehaving",
+      "VerificationFromCache": true,
+      "Raw": "postgresql://findone:findone@db:5432",
+      "RawV2": "postgresql://findone:findone@db:5432",
+      "Redacted": "",
+      "ExtraData": {
+        "sslmode": "<unset>"
+      },
+      "StructuredData": null
+    },
+    {
+      "SourceMetadata": {
+        "Data": {
+          "Git": {
+            "commit": "2cea20456db62a0428030049a96ea22b7a8d941b",
+            "file": "docker-compose.yml",
+            "email": "github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>",
+            "repository": "file:///home/user/Github/Find-One",
+            "timestamp": "2026-04-16 01:17:31 +0000",
+            "line": 38,
+            "repository_local_path": "/tmp/trufflehog-139664-2567781113"
+          }
+        }
+      },
+      "SourceID": 1,
+      "SourceType": 16,
+      "SourceName": "trufflehog - git",
+      "DetectorType": 968,
+      "DetectorName": "Postgres",
+      "DetectorDescription": "Postgres connection string containing credentials",
+      "DecoderName": "PLAIN",
+      "Verified": false,
+      "VerificationError": "lookup db on 127.0.0.53:53: server misbehaving",
+      "VerificationFromCache": false,
+      "Raw": "postgresql://findone:findone@db:5432",
+      "RawV2": "postgresql://findone:findone@db:5432",
+      "Redacted": "",
+      "ExtraData": {
+        "sslmode": "<unset>"
+      },
+      "StructuredData": null
+    },
+    {
+      "SourceMetadata": {
+        "Data": {
+          "Git": {
+            "commit": "a6107b220dec51481b031fd583737934db0fde33",
+            "file": "docker-compose.yml",
+            "email": "Setounkpe7 <mdoubogan@yahoo.fr>",
+            "repository": "file:///home/user/Github/Find-One",
+            "timestamp": "2026-04-14 00:02:14 +0000",
+            "line": 37,
+            "repository_local_path": "/tmp/trufflehog-139664-2567781113"
+          }
+        }
+      },
+      "SourceID": 1,
+      "SourceType": 16,
+      "SourceName": "trufflehog - git",
+      "DetectorType": 968,
+      "DetectorName": "Postgres",
+      "DetectorDescription": "Postgres connection string containing credentials",
+      "DecoderName": "PLAIN",
+      "Verified": false,
+      "VerificationError": "lookup db on 127.0.0.53:53: server misbehaving",
+      "VerificationFromCache": true,
+      "Raw": "postgresql://findone:findone@db:5432",
+      "RawV2": "postgresql://findone:findone@db:5432",
+      "Redacted": "",
+      "ExtraData": {
+        "sslmode": "<unset>"
+      },
+      "StructuredData": null
+    },
+    {
+      "SourceMetadata": {
+        "Data": {
+          "Git": {
+            "commit": "1d82afaeeea99d787f775416e088a720ca867b80",
+            "file": "docs/superpowers/plans/find-one-implementation-plan.md",
+            "email": "Setounkpe7 <mdoubogan@yahoo.fr>",
+            "repository": "file:///home/user/Github/Find-One",
+            "timestamp": "2026-04-13 23:49:14 +0000",
+            "line": 348
+          }
+        }
+      },
+      "SourceID": 1,
+      "SourceType": 16,
+      "SourceName": "trufflehog - git",
+      "DetectorType": 968,
+      "DetectorName": "Postgres",
+      "DetectorDescription": "Postgres connection string containing credentials",
+      "DecoderName": "PLAIN",
+      "Verified": false,
+      "VerificationError": "lookup db on 127.0.0.53:53: server misbehaving",
+      "VerificationFromCache": true,
+      "Raw": "postgresql://findone:findone@db:5432",
+      "RawV2": "postgresql://findone:findone@db:5432",
+      "Redacted": "",
+      "ExtraData": {
+        "sslmode": "<unset>"
+      },
+      "StructuredData": null
+    }
+  ]
+}

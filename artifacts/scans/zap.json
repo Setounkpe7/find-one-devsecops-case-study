@@ -1,0 +1,875 @@
+{
+	"@programName": "ZAP",
+	"@version": "2.17.0",
+	"@generated": "Mon, 20 Apr 2026 18:47:30",
+	"created": "2026-04-20T18:47:30.014919436Z",
+	"insights":[
+		{
+			"level": "Low",
+			"reason": "Warning",
+			"site": "",
+			"key": "insight.log.warn",
+			"description": "ZAP warnings logged - see the zap.log file for details",
+			"statistic": "30"
+		},
+		{
+			"level": "Low",
+			"reason": "Exceeded High",
+			"site": "http://localhost:8000",
+			"key": "insight.code.4xx",
+			"description": "Percentage of responses with status code 4xx",
+			"statistic": "99"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://localhost:8000",
+			"key": "insight.endpoint.ctype.application/json",
+			"description": "Percentage of endpoints with content type application/json",
+			"statistic": "100"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://localhost:8000",
+			"key": "insight.endpoint.method.DELETE",
+			"description": "Percentage of endpoints with method DELETE",
+			"statistic": "7"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://localhost:8000",
+			"key": "insight.endpoint.method.GET",
+			"description": "Percentage of endpoints with method GET",
+			"statistic": "52"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://localhost:8000",
+			"key": "insight.endpoint.method.POST",
+			"description": "Percentage of endpoints with method POST",
+			"statistic": "33"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://localhost:8000",
+			"key": "insight.endpoint.method.PUT",
+			"description": "Percentage of endpoints with method PUT",
+			"statistic": "7"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://localhost:8000",
+			"key": "insight.endpoint.total",
+			"description": "Count of total endpoints",
+			"statistic": "57"
+		}
+	],
+	"site":[ 
+		{
+			"@name": "http://localhost:8000",
+			"@host": "localhost",
+			"@port": "8000",
+			"@ssl": "false",
+			"alerts": [ 
+				{
+					"pluginid": "90004",
+					"alertRef": "90004-1",
+					"alert": "Cross-Origin-Resource-Policy Header Missing or Invalid",
+					"name": "Cross-Origin-Resource-Policy Header Missing or Invalid",
+					"riskcode": "1",
+					"confidence": "2",
+					"riskdesc": "Low (Medium)",
+					"desc": "<p>Cross-Origin-Resource-Policy header is an opt-in header designed to counter side-channels attacks like Spectre. Resource should be specifically set as shareable amongst different origins.</p>",
+					"instances":[ 
+						{
+							"id": "519",
+							"uri": "http://localhost:8000/health",
+							"nodeName": "http:\/\/localhost:8000\/health",
+							"method": "GET",
+							"param": "Cross-Origin-Resource-Policy",
+							"attack": "",
+							"evidence": "",
+							"otherinfo": ""
+						},
+						{
+							"id": "433",
+							"uri": "http://localhost:8000/openapi.json",
+							"nodeName": "http:\/\/localhost:8000\/openapi.json",
+							"method": "GET",
+							"param": "Cross-Origin-Resource-Policy",
+							"attack": "",
+							"evidence": "",
+							"otherinfo": ""
+						}
+					],
+					"count": "2",
+					"systemic": true,
+					"solution": "<p>Ensure that the application/web server sets the Cross-Origin-Resource-Policy header appropriately, and that it sets the Cross-Origin-Resource-Policy header to 'same-origin' for all web pages.</p><p>'same-site' is considered as less secured and should be avoided.</p><p>If resources must be shared, set the header to 'cross-origin'.</p><p>If possible, ensure that the end user uses a standards-compliant and modern web browser that supports the Cross-Origin-Resource-Policy header (https://caniuse.com/mdn-http_headers_cross-origin-resource-policy).</p>",
+					"otherinfo": "",
+					"reference": "<p>https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Cross-Origin-Embedder-Policy</p>",
+					"cweid": "693",
+					"wascid": "14",
+					"sourceid": "24"
+				},
+				{
+					"pluginid": "10021",
+					"alertRef": "10021",
+					"alert": "X-Content-Type-Options Header Missing",
+					"name": "X-Content-Type-Options Header Missing",
+					"riskcode": "1",
+					"confidence": "2",
+					"riskdesc": "Low (Medium)",
+					"desc": "<p>The Anti-MIME-Sniffing header X-Content-Type-Options was not set to 'nosniff'. This allows older versions of Internet Explorer and Chrome to perform MIME-sniffing on the response body, potentially causing the response body to be interpreted and displayed as a content type other than the declared content type. Current (early 2014) and legacy versions of Firefox will use the declared content type (if one is set), rather than performing MIME-sniffing.</p>",
+					"instances":[ 
+						{
+							"id": "517",
+							"uri": "http://localhost:8000/health",
+							"nodeName": "http:\/\/localhost:8000\/health",
+							"method": "GET",
+							"param": "x-content-type-options",
+							"attack": "",
+							"evidence": "",
+							"otherinfo": "This issue still applies to error type pages (401, 403, 500, etc.) as those pages are often still affected by injection issues, in which case there is still concern for browsers sniffing pages away from their actual content type.\nAt \"High\" threshold this scan rule will not alert on client or server error responses."
+						},
+						{
+							"id": "426",
+							"uri": "http://localhost:8000/openapi.json",
+							"nodeName": "http:\/\/localhost:8000\/openapi.json",
+							"method": "GET",
+							"param": "x-content-type-options",
+							"attack": "",
+							"evidence": "",
+							"otherinfo": "This issue still applies to error type pages (401, 403, 500, etc.) as those pages are often still affected by injection issues, in which case there is still concern for browsers sniffing pages away from their actual content type.\nAt \"High\" threshold this scan rule will not alert on client or server error responses."
+						}
+					],
+					"count": "2",
+					"systemic": true,
+					"solution": "<p>Ensure that the application/web server sets the Content-Type header appropriately, and that it sets the X-Content-Type-Options header to 'nosniff' for all web pages.</p><p>If possible, ensure that the end user uses a standards-compliant and modern web browser that does not perform MIME-sniffing at all, or that can be directed by the web application/web server to not perform MIME-sniffing.</p>",
+					"otherinfo": "<p>This issue still applies to error type pages (401, 403, 500, etc.) as those pages are often still affected by injection issues, in which case there is still concern for browsers sniffing pages away from their actual content type.</p><p>At \"High\" threshold this scan rule will not alert on client or server error responses.</p>",
+					"reference": "<p>https://learn.microsoft.com/en-us/previous-versions/windows/internet-explorer/ie-developer/compatibility/gg622941(v=vs.85)</p><p>https://owasp.org/www-community/Security_Headers</p>",
+					"cweid": "693",
+					"wascid": "15",
+					"sourceid": "24"
+				},
+				{
+					"pluginid": "100000",
+					"alertRef": "100000-1",
+					"alert": "A Client Error response code was returned by the server",
+					"name": "A Client Error response code was returned by the server",
+					"riskcode": "0",
+					"confidence": "3",
+					"riskdesc": "Informational (High)",
+					"desc": "<p>A response code of 401 was returned by the server.</p><p>This may indicate that the application is failing to handle unexpected input correctly.</p><p>Raised by the 'Alert on HTTP Response Code Error' script</p>",
+					"instances":[ 
+						{
+							"id": "6",
+							"uri": "http://localhost:8000/api/jobs/job_id",
+							"nodeName": "http:\/\/localhost:8000\/api\/jobs\/job_id",
+							"method": "DELETE",
+							"param": "",
+							"attack": "",
+							"evidence": "401",
+							"otherinfo": ""
+						},
+						{
+							"id": "1930",
+							"uri": "http://localhost:8000/api/jobs/job_id/",
+							"nodeName": "http:\/\/localhost:8000\/api\/jobs\/job_id\/",
+							"method": "DELETE",
+							"param": "",
+							"attack": "",
+							"evidence": "401",
+							"otherinfo": ""
+						},
+						{
+							"id": "13",
+							"uri": "http://localhost:8000/api/templates/template_id",
+							"nodeName": "http:\/\/localhost:8000\/api\/templates\/template_id",
+							"method": "DELETE",
+							"param": "",
+							"attack": "",
+							"evidence": "401",
+							"otherinfo": ""
+						},
+						{
+							"id": "1937",
+							"uri": "http://localhost:8000/api/templates/template_id/",
+							"nodeName": "http:\/\/localhost:8000\/api\/templates\/template_id\/",
+							"method": "DELETE",
+							"param": "",
+							"attack": "",
+							"evidence": "401",
+							"otherinfo": ""
+						},
+						{
+							"id": "22",
+							"uri": "http://localhost:8000",
+							"nodeName": "http:\/\/localhost:8000",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "1942",
+							"uri": "http://localhost:8000/",
+							"nodeName": "http:\/\/localhost:8000\/",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "15",
+							"uri": "http://localhost:8000/6041331380072773088",
+							"nodeName": "http:\/\/localhost:8000\/6041331380072773088",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "32",
+							"uri": "http://localhost:8000/api",
+							"nodeName": "http:\/\/localhost:8000\/api",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "1947",
+							"uri": "http://localhost:8000/api/",
+							"nodeName": "http:\/\/localhost:8000\/api\/",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "16",
+							"uri": "http://localhost:8000/api/8513747067119112706",
+							"nodeName": "http:\/\/localhost:8000\/api\/8513747067119112706",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "44",
+							"uri": "http://localhost:8000/api/documents",
+							"nodeName": "http:\/\/localhost:8000\/api\/documents",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "1949",
+							"uri": "http://localhost:8000/api/documents/",
+							"nodeName": "http:\/\/localhost:8000\/api\/documents\/",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "17",
+							"uri": "http://localhost:8000/api/documents/1470395406043656024",
+							"nodeName": "http:\/\/localhost:8000\/api\/documents\/1470395406043656024",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "2200",
+							"uri": "http://localhost:8000/api/documents/actuator/health",
+							"nodeName": "http:\/\/localhost:8000\/api\/documents\/actuator\/health",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "2",
+							"uri": "http://localhost:8000/api/jobs",
+							"nodeName": "http:\/\/localhost:8000\/api\/jobs",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "401",
+							"otherinfo": ""
+						},
+						{
+							"id": "1952",
+							"uri": "http://localhost:8000/api/jobs/",
+							"nodeName": "http:\/\/localhost:8000\/api\/jobs\/",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "401",
+							"otherinfo": ""
+						},
+						{
+							"id": "18",
+							"uri": "http://localhost:8000/api/jobs/2069726236455540124",
+							"nodeName": "http:\/\/localhost:8000\/api\/jobs\/2069726236455540124",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "401",
+							"otherinfo": ""
+						},
+						{
+							"id": "4",
+							"uri": "http://localhost:8000/api/jobs/job_id",
+							"nodeName": "http:\/\/localhost:8000\/api\/jobs\/job_id",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "401",
+							"otherinfo": ""
+						},
+						{
+							"id": "1954",
+							"uri": "http://localhost:8000/api/jobs/job_id/",
+							"nodeName": "http:\/\/localhost:8000\/api\/jobs\/job_id\/",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "401",
+							"otherinfo": ""
+						},
+						{
+							"id": "7",
+							"uri": "http://localhost:8000/api/profile",
+							"nodeName": "http:\/\/localhost:8000\/api\/profile",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "401",
+							"otherinfo": ""
+						},
+						{
+							"id": "1957",
+							"uri": "http://localhost:8000/api/profile/",
+							"nodeName": "http:\/\/localhost:8000\/api\/profile\/",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "401",
+							"otherinfo": ""
+						},
+						{
+							"id": "49",
+							"uri": "http://localhost:8000/api/search",
+							"nodeName": "http:\/\/localhost:8000\/api\/search",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "1955",
+							"uri": "http://localhost:8000/api/search/",
+							"nodeName": "http:\/\/localhost:8000\/api\/search\/",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "19",
+							"uri": "http://localhost:8000/api/search/5902180938442297807",
+							"nodeName": "http:\/\/localhost:8000\/api\/search\/5902180938442297807",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "1961",
+							"uri": "http://localhost:8000/api/search/jobs",
+							"nodeName": "http:\/\/localhost:8000\/api\/search\/jobs",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "401",
+							"otherinfo": ""
+						},
+						{
+							"id": "10",
+							"uri": "http://localhost:8000/api/search/jobs?query=ZAP&page=1",
+							"nodeName": "http:\/\/localhost:8000\/api\/search\/jobs (page,query)",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "401",
+							"otherinfo": ""
+						},
+						{
+							"id": "1962",
+							"uri": "http://localhost:8000/api/search/jobs/",
+							"nodeName": "http:\/\/localhost:8000\/api\/search\/jobs\/",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "401",
+							"otherinfo": ""
+						},
+						{
+							"id": "11",
+							"uri": "http://localhost:8000/api/templates",
+							"nodeName": "http:\/\/localhost:8000\/api\/templates",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "401",
+							"otherinfo": ""
+						},
+						{
+							"id": "1960",
+							"uri": "http://localhost:8000/api/templates/",
+							"nodeName": "http:\/\/localhost:8000\/api\/templates\/",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "401",
+							"otherinfo": ""
+						},
+						{
+							"id": "20",
+							"uri": "http://localhost:8000/api/templates/168627858046167318",
+							"nodeName": "http:\/\/localhost:8000\/api\/templates\/168627858046167318",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "405",
+							"otherinfo": ""
+						},
+						{
+							"id": "58",
+							"uri": "http://localhost:8000/auth",
+							"nodeName": "http:\/\/localhost:8000\/auth",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "1963",
+							"uri": "http://localhost:8000/auth/",
+							"nodeName": "http:\/\/localhost:8000\/auth\/",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "21",
+							"uri": "http://localhost:8000/auth/1828230333374768690",
+							"nodeName": "http:\/\/localhost:8000\/auth\/1828230333374768690",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "14",
+							"uri": "http://localhost:8000/api/documents/generate",
+							"nodeName": "http:\/\/localhost:8000\/api\/documents\/generate ()({job_offer_id,doc_type,language,template_id})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "401",
+							"otherinfo": ""
+						},
+						{
+							"id": "1931",
+							"uri": "http://localhost:8000/api/documents/generate/",
+							"nodeName": "http:\/\/localhost:8000\/api\/documents\/generate\/ ()({job_offer_id,doc_type,language,template_id})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "401",
+							"otherinfo": ""
+						},
+						{
+							"id": "3",
+							"uri": "http://localhost:8000/api/jobs",
+							"nodeName": "http:\/\/localhost:8000\/api\/jobs ()({\"title\":\"John Doe\",\"company\":\"John Doe\",\"url\":https:\/\/zap.example.com,\"location\":\"John Doe\",\"salary\":\"John Doe\",\"contract_type\":\"cdi\",\"recruiter_name\":\"John Doe\",\"status\":\"to_apply\",\"applied_at\":\"1970-01-01\",\"followup_date\":\"1970-01-01\",\"interview_date\":\"1970-01-01\",\"notes\":\"John Doe\",\"source\":\"manual\"})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "422",
+							"otherinfo": ""
+						},
+						{
+							"id": "1936",
+							"uri": "http://localhost:8000/api/jobs/",
+							"nodeName": "http:\/\/localhost:8000\/api\/jobs\/ ()({\"title\":\"John Doe\",\"company\":\"John Doe\",\"url\":https:\/\/zap.example.com,\"location\":\"John Doe\",\"salary\":\"John Doe\",\"contract_type\":\"cdi\",\"recruiter_name\":\"John Doe\",\"status\":\"to_apply\",\"applied_at\":\"1970-01-01\",\"followup_date\":\"1970-01-01\",\"interview_date\":\"1970-01-01\",\"notes\":\"John Doe\",\"source\":\"manual\"})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "422",
+							"otherinfo": ""
+						},
+						{
+							"id": "9",
+							"uri": "http://localhost:8000/api/search/url",
+							"nodeName": "http:\/\/localhost:8000\/api\/search\/url ()({url})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "401",
+							"otherinfo": ""
+						},
+						{
+							"id": "1934",
+							"uri": "http://localhost:8000/api/search/url/",
+							"nodeName": "http:\/\/localhost:8000\/api\/search\/url\/ ()({url})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "401",
+							"otherinfo": ""
+						},
+						{
+							"id": "2150",
+							"uri": "http://localhost:8000/api/templates",
+							"nodeName": "http:\/\/localhost:8000\/api\/templates ()(multipart:name,job_type,file)",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						},
+						{
+							"id": "12",
+							"uri": "http://localhost:8000/api/templates",
+							"nodeName": "http:\/\/localhost:8000\/api\/templates ()(multipart:name,job_type,file)",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "401",
+							"otherinfo": ""
+						},
+						{
+							"id": "1939",
+							"uri": "http://localhost:8000/api/templates/",
+							"nodeName": "http:\/\/localhost:8000\/api\/templates\/ ()(multipart:name,job_type,file)",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "401",
+							"otherinfo": ""
+						},
+						{
+							"id": "1",
+							"uri": "http://localhost:8000/auth/login",
+							"nodeName": "http:\/\/localhost:8000\/auth\/login ()({email,password})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "401",
+							"otherinfo": ""
+						},
+						{
+							"id": "27",
+							"uri": "http://localhost:8000/auth/login",
+							"nodeName": "http:\/\/localhost:8000\/auth\/login ()({email,password})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "422",
+							"otherinfo": ""
+						},
+						{
+							"id": "1946",
+							"uri": "http://localhost:8000/auth/login/",
+							"nodeName": "http:\/\/localhost:8000\/auth\/login\/ ()({email,password})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "401",
+							"otherinfo": ""
+						},
+						{
+							"id": "0",
+							"uri": "http://localhost:8000/auth/register",
+							"nodeName": "http:\/\/localhost:8000\/auth\/register ()({email,password})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						},
+						{
+							"id": "25",
+							"uri": "http://localhost:8000/auth/register",
+							"nodeName": "http:\/\/localhost:8000\/auth\/register ()({email,password})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "422",
+							"otherinfo": ""
+						},
+						{
+							"id": "1945",
+							"uri": "http://localhost:8000/auth/register/",
+							"nodeName": "http:\/\/localhost:8000\/auth\/register\/ ()({email,password})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						},
+						{
+							"id": "1435",
+							"uri": "http://localhost:8000/computeMetadata/v1/",
+							"nodeName": "http:\/\/localhost:8000\/computeMetadata\/v1\/ ()({job_offer_id,doc_type,language,template_id})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "1433",
+							"uri": "http://localhost:8000/latest/meta-data/",
+							"nodeName": "http:\/\/localhost:8000\/latest\/meta-data\/ ()({job_offer_id,doc_type,language,template_id})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "1466",
+							"uri": "http://localhost:8000/metadata/instance",
+							"nodeName": "http:\/\/localhost:8000\/metadata\/instance ()({job_offer_id,doc_type,language,template_id})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "1473",
+							"uri": "http://localhost:8000/metadata/v1",
+							"nodeName": "http:\/\/localhost:8000\/metadata\/v1 ()({job_offer_id,doc_type,language,template_id})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "1445",
+							"uri": "http://localhost:8000/opc/v1/instance/",
+							"nodeName": "http:\/\/localhost:8000\/opc\/v1\/instance\/ ()({job_offer_id,doc_type,language,template_id})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "1453",
+							"uri": "http://localhost:8000/opc/v2/instance/",
+							"nodeName": "http:\/\/localhost:8000\/opc\/v2\/instance\/ ()({job_offer_id,doc_type,language,template_id})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "1476",
+							"uri": "http://localhost:8000/openstack/latest/meta_data.json",
+							"nodeName": "http:\/\/localhost:8000\/openstack\/latest\/meta_data.json ()({job_offer_id,doc_type,language,template_id})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "5",
+							"uri": "http://localhost:8000/api/jobs/job_id",
+							"nodeName": "http:\/\/localhost:8000\/api\/jobs\/job_id ()({\"title\":\"John Doe\",\"company\":\"John Doe\",\"url\":https:\/\/zap.example.com,\"location\":\"John Doe\",\"salary\":\"John Doe\",\"contract_type\":\"cdi\",\"recruiter_name\":\"John Doe\",\"status\":\"to_apply\",\"applied_at\":\"1970-01-01\",\"followup_date\":\"1970-01-01\",\"interview_date\":\"1970-01-01\",\"notes\":\"John Doe\"})",
+							"method": "PUT",
+							"param": "",
+							"attack": "",
+							"evidence": "422",
+							"otherinfo": ""
+						},
+						{
+							"id": "1925",
+							"uri": "http://localhost:8000/api/jobs/job_id/",
+							"nodeName": "http:\/\/localhost:8000\/api\/jobs\/job_id\/ ()({\"title\":\"John Doe\",\"company\":\"John Doe\",\"url\":https:\/\/zap.example.com,\"location\":\"John Doe\",\"salary\":\"John Doe\",\"contract_type\":\"cdi\",\"recruiter_name\":\"John Doe\",\"status\":\"to_apply\",\"applied_at\":\"1970-01-01\",\"followup_date\":\"1970-01-01\",\"interview_date\":\"1970-01-01\",\"notes\":\"John Doe\"})",
+							"method": "PUT",
+							"param": "",
+							"attack": "",
+							"evidence": "422",
+							"otherinfo": ""
+						},
+						{
+							"id": "8",
+							"uri": "http://localhost:8000/api/profile",
+							"nodeName": "http:\/\/localhost:8000\/api\/profile ()({generation_instructions,preferred_language})",
+							"method": "PUT",
+							"param": "",
+							"attack": "",
+							"evidence": "401",
+							"otherinfo": ""
+						},
+						{
+							"id": "1927",
+							"uri": "http://localhost:8000/api/profile/",
+							"nodeName": "http:\/\/localhost:8000\/api\/profile\/ ()({generation_instructions,preferred_language})",
+							"method": "PUT",
+							"param": "",
+							"attack": "",
+							"evidence": "401",
+							"otherinfo": ""
+						}
+					],
+					"count": "59",
+					"systemic": false,
+					"solution": "",
+					"otherinfo": "",
+					"reference": "",
+					"cweid": "388",
+					"wascid": "20",
+					"sourceid": "12"
+				},
+				{
+					"pluginid": "10111",
+					"alertRef": "10111",
+					"alert": "Authentication Request Identified",
+					"name": "Authentication Request Identified",
+					"riskcode": "0",
+					"confidence": "3",
+					"riskdesc": "Informational (High)",
+					"desc": "<p>The given request has been identified as an authentication request. The 'Other Info' field contains a set of key=value lines which identify any relevant fields. If the request is in a context which has an Authentication Method set to \"Auto-Detect\" then this rule will change the authentication to match the request identified.</p>",
+					"instances":[ 
+						{
+							"id": "345",
+							"uri": "http://localhost:8000/auth/login",
+							"nodeName": "http:\/\/localhost:8000\/auth\/login ()({email,password})",
+							"method": "POST",
+							"param": "email",
+							"attack": "",
+							"evidence": "password",
+							"otherinfo": "userParam=email\nuserValue=zaproxy@example.com\npasswordParam=password"
+						}
+					],
+					"count": "1",
+					"systemic": false,
+					"solution": "<p>This is an informational alert rather than a vulnerability and so there is nothing to fix.</p>",
+					"otherinfo": "<p>userParam=email</p><p>userValue=zaproxy@example.com</p><p>passwordParam=password</p>",
+					"reference": "<p>https://www.zaproxy.org/docs/desktop/addons/authentication-helper/auth-req-id/</p>",
+					"cweid": "-1",
+					"wascid": "-1",
+					"sourceid": "5"
+				},
+				{
+					"pluginid": "10049",
+					"alertRef": "10049-1",
+					"alert": "Non-Storable Content",
+					"name": "Non-Storable Content",
+					"riskcode": "0",
+					"confidence": "2",
+					"riskdesc": "Informational (Medium)",
+					"desc": "<p>The response contents are not storable by caching components such as proxy servers. If the response does not contain sensitive, personal or user-specific information, it may benefit from being stored and cached, to improve performance.</p>",
+					"instances":[ 
+						{
+							"id": "392",
+							"uri": "http://localhost:8000/api/jobs",
+							"nodeName": "http:\/\/localhost:8000\/api\/jobs",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "authorization:",
+							"otherinfo": ""
+						},
+						{
+							"id": "432",
+							"uri": "http://localhost:8000/openapi.json",
+							"nodeName": "http:\/\/localhost:8000\/openapi.json",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "authorization:",
+							"otherinfo": ""
+						},
+						{
+							"id": "390",
+							"uri": "http://localhost:8000/auth/login",
+							"nodeName": "http:\/\/localhost:8000\/auth\/login ()({email,password})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "authorization:",
+							"otherinfo": ""
+						},
+						{
+							"id": "397",
+							"uri": "http://localhost:8000/auth/register",
+							"nodeName": "http:\/\/localhost:8000\/auth\/register ()({email,password})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "authorization:",
+							"otherinfo": ""
+						},
+						{
+							"id": "439",
+							"uri": "http://localhost:8000/api/jobs/job_id",
+							"nodeName": "http:\/\/localhost:8000\/api\/jobs\/job_id ()({\"title\":\"John Doe\",\"company\":\"John Doe\",\"url\":https:\/\/zap.example.com,\"location\":\"John Doe\",\"salary\":\"John Doe\",\"contract_type\":\"cdi\",\"recruiter_name\":\"John Doe\",\"status\":\"to_apply\",\"applied_at\":\"1970-01-01\",\"followup_date\":\"1970-01-01\",\"interview_date\":\"1970-01-01\",\"notes\":\"John Doe\"})",
+							"method": "PUT",
+							"param": "",
+							"attack": "",
+							"evidence": "PUT ",
+							"otherinfo": ""
+						}
+					],
+					"count": "5",
+					"systemic": true,
+					"solution": "<p>The content may be marked as storable by ensuring that the following conditions are satisfied:</p><p>The request method must be understood by the cache and defined as being cacheable (\"GET\", \"HEAD\", and \"POST\" are currently defined as cacheable)</p><p>The response status code must be understood by the cache (one of the 1XX, 2XX, 3XX, 4XX, or 5XX response classes are generally understood)</p><p>The \"no-store\" cache directive must not appear in the request or response header fields</p><p>For caching by \"shared\" caches such as \"proxy\" caches, the \"private\" response directive must not appear in the response</p><p>For caching by \"shared\" caches such as \"proxy\" caches, the \"Authorization\" header field must not appear in the request, unless the response explicitly allows it (using one of the \"must-revalidate\", \"public\", or \"s-maxage\" Cache-Control response directives)</p><p>In addition to the conditions above, at least one of the following conditions must also be satisfied by the response:</p><p>It must contain an \"Expires\" header field</p><p>It must contain a \"max-age\" response directive</p><p>For \"shared\" caches such as \"proxy\" caches, it must contain a \"s-maxage\" response directive</p><p>It must contain a \"Cache Control Extension\" that allows it to be cached</p><p>It must have a status code that is defined as cacheable by default (200, 203, 204, 206, 300, 301, 404, 405, 410, 414, 501).</p>",
+					"otherinfo": "",
+					"reference": "<p>https://datatracker.ietf.org/doc/html/rfc7234</p><p>https://datatracker.ietf.org/doc/html/rfc7231</p><p>https://www.w3.org/Protocols/rfc2616/rfc2616-sec13.html</p>",
+					"cweid": "524",
+					"wascid": "13",
+					"sourceid": "6"
+				}
+			]
+		}
+	],
+	"sequences":[
+	]
+
+}

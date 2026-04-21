@@ -1,0 +1,30 @@
+repos:
+  # Secrets scanning
+  - repo: local
+    hooks:
+      - id: trufflehog
+        name: TruffleHog — scan for secrets
+        entry: trufflehog git file://. --only-verified --fail
+        language: system
+        pass_filenames: false
+        stages: [pre-commit]
+
+  # Backend unit tests
+  - repo: local
+    hooks:
+      - id: pytest
+        name: Backend unit tests
+        entry: bash -c "cd backend && python -m pytest tests/ -x -q --tb=short"
+        language: system
+        pass_filenames: false
+        stages: [pre-commit]
+
+  # Frontend unit tests
+  - repo: local
+    hooks:
+      - id: vitest
+        name: Frontend unit tests
+        entry: bash -c "cd frontend && npm run test:run"
+        language: system
+        pass_filenames: false
+        stages: [pre-commit]
