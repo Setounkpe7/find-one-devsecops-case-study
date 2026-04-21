@@ -1,0 +1,16 @@
+# Allowlist: deny everything by default, explicitly allow the files in the repo layout
+*
+
+# Top-level files
+!README.md
+!REPORT.md
+!LICENSE
+!.gitignore
+
+# artifacts/ tree
+!artifacts/
+!artifacts/**
+
+# screenshots/ tree
+!screenshots/
+!screenshots/**
