@@ -205,3 +205,11 @@ Each of these is a known issue, not a blind spot I missed. That distinction is w
 - `artifacts/runbook.md`: rollback and scan-failure procedures.
 - `artifacts/scans/`: seven JSON outputs from the scanners described above.
 - `screenshots/`: seven captures of the pipeline in action on `Setounkpe7/Find-One`.
+
+## 13. Related work
+
+- [railsgoat-security](https://github.com/Setounkpe7/railsgoat-security) —
+  the same DevSecOps approach applied to a deliberately vulnerable Rails
+  training app (OWASP RailsGoat). Adds container scanning, DAST against a
+  live container, and a Cosign-signed image on GHCR — the layers
+  Find-One didn't need because of its serverless deployment model.
